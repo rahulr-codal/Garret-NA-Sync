@@ -65,7 +65,9 @@ const getProductVariants = (product) => {
             price: SKUPriceUSD[variant["EAN"]],
             option_values: getOptionValues(variant),
         };
-        variantArr.push(obj);
+        if(obj.option_values){
+            variantArr.push(obj);
+        }
     }
     return variantArr;
 };
@@ -75,38 +77,44 @@ const getOptionValues = (variantData) => {
     for(let key of Object.keys(variantData)){
         let keyLower = key.toLowerCase();
         switch(keyLower){
-            case "color": options.push({ label: getColorName(variantData[key]), option_display_name: "Color" })
-                          break;
+            case "color": 
+                let colorName = getColorName(variantData[key]);
+                if(colorName){
+                    options.push({ label: colorName, option_display_name: "Color" })
+                }
+                break;
             case "us_consumer_size": options.push({ label: variantData[key], option_display_name: "Size" })
         }
     }
+    // filter out options which are missing any option from a switch case
+    options = options.length == 2 ? options : null;
     return options;
 };
 
-const ColorCodeRegx = /^[A-Z0-9]{2,4}$/
+const ColorCodeRegx = /^[A-Z0-9]{4}$/
 const getColorName = (colorCode) => {
     console.log("Color code -> ", colorCode);
-    if(colorCode == 0){ colorCode = "00" };
+    // if(colorCode == 0){ colorCode = "00" };
     if(ColorCodeRegx.test(colorCode)){
         let colorName = "";
-        if(colorCode.length == 3){
-            colorCode = "0" + colorCode;
-        }
+        // if(colorCode.length == 3){
+        //     colorCode = "0" + colorCode;
+        // }
         let colorCode1 = colorCode.substring(0, 2);
         let colorName1 = ColorCodes[colorCode1];
         // console.log("colorCode1", colorCode1, "colorName1", colorName1);
-        let colorName2 = null;
-        if(colorCode.length == 4){
-            let colorCode2 = colorCode.substring(2)
-            colorName2 = ColorCodes[colorCode2];
+        // let colorName2 = null;
+        // if(colorCode.length == 4){
+        let colorCode2 = colorCode.substring(2)
+        let colorName2 = ColorCodes[colorCode2];
             // console.log("colorCode2", colorCode2, "colorName2", colorName2);
-        }
+        // }
         colorName = [colorName1, colorName2]
             .filter(v => v && v != "none").map(v => titleCase(v)).join("/");
         console.log("Color name -> ", colorName);
         return colorName || "None";
     }else{
-        return colorCode;
+        return null;
     }
 };
     
