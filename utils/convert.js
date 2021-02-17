@@ -43,7 +43,7 @@ const getCustomFields = (product) => {
         { "name": "secondary_end_use", "value": product["Secondary End Use"].trim().slice(0, 250) },
         // { "name": "materials_en", "value": product["Materials EN"].trim().slice(0, 250) },
         // { "name": "care_instructions_en", "value": product["Care Instructions EN"].trim().slice(0, 250) },
-        // { "name": "shop_runner_eligible", "value": product["ShopRunner Eligible"].trim().slice(0, 250) },
+        { "name": "shop_runner_eligible", "value": product["ShopRunner Eligible"].trim().slice(0, 250) },
         // { "colours": product["Colours"].trim().slice(0, 250) },
         
     ];
