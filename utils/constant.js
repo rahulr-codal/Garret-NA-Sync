@@ -1,0 +1,48 @@
+
+const ColorCodes = { 
+    "01": "white",
+    "08": "neon yellow",
+    "13": "jazzy pink",
+    "21": "lumi orange",
+    "27": "scuba blue",
+    "35": "red",
+    "86": "asteroid grey",
+    "91": "graphite grey",
+    "92": "light grey",
+    "99": "black",
+    "0B": "raspberry rose",
+    "0E": "castor grey",
+    "0G": "orange.com",
+    "0L": "coral glow",
+    "0M": "ciel blue",
+    "0N": "dynamic cyan",
+    "0O": "solar yellow",
+    "0Q": "desert green",
+    "0R": "terra grey",
+    "0S": "marine blue",
+    "AA": "Print terra grey",
+    "AB": "Print coral glow",
+    "AH": "deep water blue",
+    "AI": "cloudy blue",
+    "AJ": "chestnut red",
+    "AK": "hibiscus pink",
+    "AL": "nickel",
+    "AM": "lava grey",
+    "AN": "pacific blue",
+    "AO": "storm blue",
+    "AP": "nordic blue",
+    "AR": "citrus green",
+    "AT": "dark nordic blue",
+    "AU": "orbit blue",
+    "AV": "dark graphite gray",
+    "AY": "fireball",
+    "AZ": "sphere blue",
+    "BB": "urban gray",
+    "BC": "graystone",
+    "MC": "multicolor",
+    "00": "none"
+}
+
+module.exports = {
+    ColorCodes
+}
