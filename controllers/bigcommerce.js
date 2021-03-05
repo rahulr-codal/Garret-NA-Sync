@@ -317,7 +317,28 @@ const listProductOptions = async (productId, params) => {
     }
 }
 
-
+// ============================ Images ==================================== //
+const createVariantImage = async (productId, variantId, data) => {
+    try {
+        let options = {
+          url: `${BaseURL}/v3/catalog/products/${productId}/variants/${variantId}/image`,
+          method: 'post',
+          data: data,
+          headers: { ...Headers, "content-type": "multipart/form-data", ...data.getHeaders()}
+        }
+        console.log("options", options)
+        let response = await axios.request(options);
+        // console.log(response);
+        return (response.data && response.data.data) || response.data;
+    } catch (error) {
+        console.log(error)
+        if(error.response && error.response.data){
+            console.log(error.response.data)   
+        }else{
+            console.log(error)
+        }
+    }
+};
 
 module.exports = {
     listProduct,
@@ -337,5 +358,7 @@ module.exports = {
     updateProductVariant,
     bulkUpdateVariants,
     // 
-    listProductOptions
+    listProductOptions,
+    // 
+    createVariantImage
 }

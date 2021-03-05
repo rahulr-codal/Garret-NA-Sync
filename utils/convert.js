@@ -316,4 +316,5 @@ const titleCase = (str) => {
 module.exports = {
     convertToBigCProduct,
     generateMetafields,
+    getColorName
 }
