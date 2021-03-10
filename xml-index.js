@@ -22,17 +22,17 @@ const {
  } = require("./utils/convert-xml-version")
 
 async function main() {
-    const productArr = await xmlFileToJSON(`${__dirname}/xml/productsSS21.xml`);
-    // const productArr = await xmlFileToJSON(`${__dirname}/xml/allSS21MasterProducts.xml`);
-    const productVarient = await xmlFileToJSON(`${__dirname}/xml/variantsSS21.xml`);
+    // const productArr = await xmlFileToJSON(`${__dirname}/xml/productsSS21.xml`);
+    const productArr = await xmlFileToJSON(`${__dirname}/xml/allSS21MasterProducts.xml`);
+    // const productVarient = await xmlFileToJSON(`${__dirname}/xml/variantsSS21.xml`);
+
     // const productVarient = await xmlFileToJSON(`${__dirname}/xml/allSS21Variants.xml`);
     const productPrice = await xmlFileToJSON(`${__dirname}/xml/pricebook-us.xml`);
     
     let productsData = normalizeXMLJSONData(productArr['catalog']['product']);
-    let variantsData = productVarient['catalog']["product"];
-    variantsData = normalizeVariantXMLJSONData(variantsData);
-    // console.log(JSON.stringify(variantsData[0]));
-    
+    // let variantsData = productVarient['catalog']["product"];
+    // variantsData = normalizeVariantXMLJSONData(variantsData);
+    // console.log(JSON.stringify(variantsData));
     let allVariantPrices = productPrice["pricebooks"]?.["pricebook"]?.["price-tables"]?.["price-table"] || [];
     allVariantPrices = normalizePriceXMLJSONData(allVariantPrices);
     // convert prices to obj [EAN, price]
@@ -50,11 +50,15 @@ async function main() {
         //     continue;
         // }
         console.log("Syncing Product -> ", product["product-id"]);
-        
-        const pVarient = variantsData.filter(
-            (i) => i["product-id"] == product["product-id"]
-        );
-        console.log(pVarient)
+        // console.log(JSON.stringify(product.variations));
+        // const pVarientOld = variantsData.filter(
+        //     (i) => i["product-id"] == product["product-id"]);
+        // console.log("\n\nOld Pvariants", JSON.stringify(pVarientOld));
+        let productVariantsData = [{
+            "product-id": product["product-id"],
+            "variations": product.variations
+        }];
+        const pVarient = normalizeVariantXMLJSONData(productVariantsData);
         product["variants"] = pVarient.map((obj) => {
             let price = SKUPriceUSD[obj.EAN] || 0
             obj.price = price;

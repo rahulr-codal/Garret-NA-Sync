@@ -8,16 +8,16 @@ const convertToBigCProduct = async (data) => {
     const bigCommProductObj = {
         brand_name: "Gore", // not able to determined in csv,
         custom_fields: getCustomFields(product),
-        description: product?.["productDetails"]["en"] || "",
-        name: (product?.["display-name"]["en"] || "").slice(0, 255) + '-xml',
+        description: product?.["productDetails"]?.["en"] || "",
+        name: (product?.["display-name"]?.["en"] || "").slice(0, 255),
         inventory_tracking: "variant",
         is_free_shipping: false,
         is_visible: true,
         type: "physical",
-        weight: +(product?.["weightOZ"]["en"] || 0),
+        weight: +(product?.["weightOZ"]?.["en"] || 0),
         variants: getProductVariants(product),
         price: 0,
-        sku: product["product-id"]?.toString() + 'xml',
+        sku: product["product-id"]?.toString(),
     }
     bigCommProductObj.categories = await getCategoriesIdsV2(product).catch(err => []);
     console.log("bigCommProductObj: ",  JSON.stringify(bigCommProductObj));
@@ -26,19 +26,19 @@ const convertToBigCProduct = async (data) => {
 
 const getCustomFields = (product) => {
     let fields = [
-        { "name": "fit", "value": validateValue(product?.["  "]["en"], "string") },
-        { "name": "gender", "value": validateValue(product?.["gender"]["en"], "string") },
-        { "name": "fabric_tech", "value": validateValue(product?.["fabricTechnology"]["en"], "string") },
-        { "name": "waterproofness", "value": validateValue(product?.["waterproofness"]["en"], "string") },
-        { "name": "windproofness", "value": validateValue(product?.["windproofness"]["en"], "string") },
-        { "name": "breathability", "value": validateValue(product?.["breathability"]["en"], "string") },
-        { "name": "insulation", "value": validateValue(product?.["insulation"]["en"], "string") },
-        { "name": "temperature", "value": validateValue(product?.["temperature"]["en"], "string") },
-        { "name": "highlights", "value": validateValue(product?.["benefits"]["en"], "string") },
-        { "name": "backpack_use", "value": validateValue(product?.["backpackUse"]["en"], "string") },
-        { "name": "seat_insert", "value": validateValue(product?.["SeatInsert"]["en"], "string") },
-        { "name": "secondary_end_use", "value": validateValue(product?.["endUseSecondary"]["en"], "string") },
-        { "name": "shop_runner_eligible", "value": validateValue(product?.["sr_eligible"]["en"], "string") },        
+        { "name": "fit", "value": validateValue(product?.["fitLevel"]?.["en"], "string") },
+        { "name": "gender", "value": validateValue(product?.["gender"]?.["en"], "string") },
+        { "name": "fabric_tech", "value": validateValue(product?.["fabricTechnology"]?.["en"], "string") },
+        { "name": "waterproofness", "value": validateValue(product?.["waterproofness"]?.["en"], "string") },
+        { "name": "windproofness", "value": validateValue(product?.["windproofness"]?.["en"], "string") },
+        { "name": "breathability", "value": validateValue(product?.["breathability"]?.["en"], "string") },
+        { "name": "insulation", "value": validateValue(product?.["insulation"]?.["en"], "string") },
+        { "name": "temperature", "value": validateValue(product?.["temperature"]?.["en"], "string") },
+        { "name": "highlights", "value": validateValue(product?.["benefits"]?.["en"], "string") },
+        { "name": "backpack_use", "value": validateValue(product?.["backpackUse"]?.["en"], "string") },
+        { "name": "seat_insert", "value": validateValue(product?.["SeatInsert"]?.["en"], "string") },
+        { "name": "secondary_end_use", "value": validateValue(product?.["endUseSecondary"]?.["en"], "string") },
+        { "name": "shop_runner_eligible", "value": validateValue(product?.["sr_eligible"]?.["en"], "string") },        
     ];
     fields = fields.filter(o => o.value);
     return fields;
@@ -116,13 +116,13 @@ const getCategoriesIdsV2 = async (product) => {
     console.log("categories ->", categories)
     let { sport, gender } = product;
     let categoryIds = [];
-    let productType = product?.["productType"]["en"];
-    let fabricTech = product?.["fabricTechnology"]["en"];
+    let productType = product?.["productType"]?.["en"];
+    let fabricTech = product?.["fabricTechnology"]?.["en"];
     let secondaryEndUse = 
-        product?.["endUseSecondary"]["en"].split(",").filter(v => v)
+        product?.["endUseSecondary"]?.["en"].split(",").filter(v => v)
         .map(v => { return ( CategoryMapping[v] ? CategoryMapping[v] : v ).toLowerCase() })
-    gender = gender["en"].toLowerCase();
-    sport = sport["en"].toLowerCase();
+    gender = gender?.["en"].toLowerCase();
+    sport = sport?.["en"].toLowerCase();
     productType = productType.toLowerCase();
     fabricTech = fabricTech.toLowerCase();
     // check if it is part of category mapping then get the corrosponding value
@@ -294,8 +294,11 @@ const normalizeVariantXMLJSONData = (data) => {
             if(typeof variantsOptions == "object" && !Array.isArray(variantsOptions)){
                 variantsOptions = [variantsOptions];
             }
-            let normalizedOptions = variantsOptions.map(o => { 
-                let usSize = o["display-value"]?.find(v => v["xml:lang"]=="en-US");
+            let normalizedOptions = variantsOptions.map(o => {
+                if(typeof o["display-value"] == "object" && !Array.isArray(o["display-value"])){
+                    o["display-value"] = [o["display-value"]];
+                }
+                let usSize = o["display-value"]?.find(v => v["xml:lang"]=="en-US" || v["xml:lang"]=="x-default");
                 // console.log("us size -> ", usSize);
                 usSize = usSize?.["#text"]?.replace(/\s+\(/g, "/").replace(")", "") ?? "";
                 // console.log("us size after -> ", usSize);
