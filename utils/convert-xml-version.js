@@ -19,7 +19,7 @@ const convertToBigCProduct = async (data) => {
         price: 0,
         sku: product["product-id"]?.toString(),
     }
-    bigCommProductObj.categories = await getCategoriesIdsV2(product).catch(err => []);
+    bigCommProductObj.categories = await getCategoriesIds(product).catch(err => []);
     console.log("bigCommProductObj: ",  JSON.stringify(bigCommProductObj));
     return bigCommProductObj;
 };
@@ -109,6 +109,98 @@ const CategoryMapping = {
     "selectedfabric": "Selected Fabric",
     "shakedry": "Shake Dry",
     "road": "Cycling"
+};
+
+const getCategoriesIds = async (product) => {
+    let categories = await listCategoryCustom();
+    console.log("categories ->", categories)
+    let { sport, gender } = product;
+    let categoryIds = [];
+    let productType = product?.["productType"]?.["en"];
+    let fabricTech = product?.["fabricTechnology"]?.["en"];
+
+    let secondaryEndUse = 
+        product?.["endUseSecondary"]?.["en"].split(",").filter(v => v)
+        .map(v => { return ( CategoryMapping[v] ? CategoryMapping[v] : v ).toLowerCase() })
+    gender = gender?.["en"].toLowerCase();
+    sport = sport?.["en"].toLowerCase();
+    productType = productType.toLowerCase();
+    fabricTech = fabricTech.toLowerCase();
+
+    // check if it is part of category mapping then get the corrosponding value
+    productType = 
+        CategoryMapping[productType] ? CategoryMapping[productType].toLowerCase(): productType;
+    fabricTech = 
+        CategoryMapping[fabricTech] ? CategoryMapping[fabricTech].toLowerCase() : fabricTech;
+    
+        // get categories by gender first
+    let menCatg = categories.find(cat => cat.name.toLowerCase().includes("men"));
+    let menCatgId = menCatg.id;
+    let womenCatg = categories.find(cat => cat.name.toLowerCase().includes("women"));
+    let womenCatgId = womenCatg.id;
+    let genderFilteredCategories = [];
+    console.log("gender", gender);
+    if(gender == "women"){
+        categoryIds = [ ...categoryIds, womenCatgId ];
+        genderFilteredCategories = categories.filter(cat => cat.id == womenCatgId || cat.parentIds.includes(womenCatgId));
+    }else if(gender == "men"){
+        categoryIds = [ ...categoryIds, menCatgId ];
+        genderFilteredCategories = categories.filter(cat => cat.id == menCatgId || cat.parentIds.includes(menCatgId));
+    }else{
+        categoryIds = [ ...categoryIds, menCatgId, womenCatgId ];
+        genderFilteredCategories = categories;
+    }
+    // console.log("categoryIds", categoryIds);
+
+    // filter categories by gender first
+    // let genderFilteredCategories = [];
+    // if(gender == "unisex"){
+    //     genderFilteredCategories = categories;
+    // }else{
+    //     let genderCat = categories.find(cat => cat.name.toLowerCase().includes(gender));
+    //     if(genderCat){
+    //         genderCatId = genderCat.id;
+    //         console.log("genderCatId", genderCatId);
+    //         genderFilteredCategories = categories.filter(cat => cat.id == genderCatId || cat.parentIds.includes(genderCatId));
+    //     }
+    // }
+    console.log("genderFilteredCategories -> ", genderFilteredCategories)
+    // get categories based on product type
+    let productTypeCatIds = [];
+    console.log("Product type", productType);
+    if(productType){
+        let productTypeCategories = genderFilteredCategories.filter(cat => cat.name.toLowerCase().includes(productType))
+        console.log("productTypeCategories", productTypeCategories);
+        productTypeCatIds = productTypeCategories.map(obj => obj.id);
+    }
+    
+    // get categories based on product sport
+    let sportCategoriesIds = [];
+    if(sport){
+        let sportCategories = categories.filter(cat => cat.name.toLowerCase().includes(sport));
+        sportCategoriesIds = sportCategories.map(obj => obj.id);
+    }
+
+    // get categories based on technology
+    let fabricTechCategoriesIds = [];
+    if(fabricTech){
+        let fabricTechCategories = categories.filter(cat => cat.name.toLowerCase() == fabricTech);
+        fabricTechCategoriesIds = fabricTechCategories.map(obj => obj.id);
+    }
+    
+    // get categories based on 'secondary end use' field
+    // console.log(secondaryEndUse);
+    let secondaryEndUseCategoriesIds = [];
+    if(secondaryEndUse){
+        let secondaryEndUseCategories = categories.filter(cat => secondaryEndUse.some(el => cat.name.toLowerCase().includes(el)))
+        secondaryEndUseCategoriesIds = secondaryEndUseCategories.map(obj => obj.id);
+    }
+
+    categoryIds = [ ...categoryIds, ...productTypeCatIds,
+        ...secondaryEndUseCategoriesIds, ...sportCategoriesIds, ...fabricTechCategoriesIds];
+
+    console.log(categoryIds);
+    return categoryIds;
 };
 
 const getCategoriesIdsV2 = async (product) => {
@@ -300,7 +392,7 @@ const normalizeVariantXMLJSONData = (data) => {
                 }
                 let usSize = o["display-value"]?.find(v => v["xml:lang"]=="en-US" || v["xml:lang"]=="x-default");
                 // console.log("us size -> ", usSize);
-                usSize = usSize?.["#text"]?.replace(/\s+\(/g, "/").replace(")", "") ?? "";
+                usSize = usSize?.["#text"]?.toString().replace(/\s+\(/g, "/").replace(")", "") ?? "";
                 // console.log("us size after -> ", usSize);
                 let euSize = o["value"];
                 return {

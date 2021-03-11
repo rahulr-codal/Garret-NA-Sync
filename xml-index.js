@@ -66,7 +66,7 @@ async function main() {
         });
         
         console.log(product);
-            // return;
+        // return;
         let bigCProductJSON = await convertToBigCProduct(product);
         let metafieldsToCreate = generateMetafields(product);
         let { sku } = bigCProductJSON;
