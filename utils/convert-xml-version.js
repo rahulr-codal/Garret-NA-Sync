@@ -408,7 +408,10 @@ const normalizeVariantXMLJSONData = (data) => {
                 if(typeof o["display-value"] == "object" && !Array.isArray(o["display-value"])){
                     o["display-value"] = [o["display-value"]];
                 }
-                let usSize = o["display-value"]?.find(v => v["xml:lang"]=="en-US" || v["xml:lang"]=="x-default");
+                let usSize = o["display-value"]?.find(v => v["xml:lang"]=="en-US");
+                if(!usSize){
+                    usSize = o["display-value"]?.find(v => v["xml:lang"]=="x-default");
+                }
                 // console.log("us size -> ", usSize);
                 usSize = usSize?.["#text"]?.toString().replace(/\s+\(/g, "/").replace(")", "") ?? "";
                 // console.log("us size after -> ", usSize);
