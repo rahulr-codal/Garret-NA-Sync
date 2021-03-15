@@ -43,7 +43,9 @@ async function main() {
 
     // return;
     // let i = 0;
-    // 100501 100459 57 093
+    // filter out products which have 'online-flag': true and 'online-flag': { en: true }
+    productsData = productsData.filter(o => o["online-flag"] == true || o["online-flag"]?.["en"] == true);
+    console.log("Total products to sync:", productsData.length);
     // for (let product of productsData.filter(p => p["product-id"] == 100501)) {
     for (let product of productsData) {
         // if(product["product-id"] < 100147){
