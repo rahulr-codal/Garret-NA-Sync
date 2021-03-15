@@ -48,12 +48,30 @@ const getProductVariants = (product) => {
     const { variants: productVariants } = product; 
     let variantArr = [];
     for(let variant of productVariants){
+        let optionValues = getOptionValues(variant);
         let obj = {
-            sku: variant["EAN"]?.toString(),
+            // sku: variant["EAN"]?.toString(),
             price: variant.price,
-            option_values: getOptionValues(variant),
+            upc: variant["EAN"]?.toString()
         };
-        if(obj.option_values){
+        if(optionValues){
+            let extraData = optionValues.reduce( (acc, o) => {
+                acc = { ...acc, ...o.extra }
+                return acc;
+            }, {});
+            obj.option_values = optionValues.map(o => {
+                delete o.extra;
+                return o;
+            });
+            // update the sku based on 'ProductID-ColorCode-Size'
+            let { colorCode="", size="" } = extraData;
+            // if we get size in form of 'XS/3' then just take the value after /
+            size = size.substring(size.indexOf("/")+1)
+            let newSku = [ product["product-id"]?.toString(), colorCode, size]
+                .filter(v => v).join("-");
+            obj.sku = newSku;
+            // console.log("new SKU -> ", newSku)
+            // console.log(obj)
             variantArr.push(obj);
         }
     }
@@ -68,10 +86,10 @@ const getOptionValues = (variantData) => {
             case "color": 
                 let colorName = getColorName(variantData[key]);
                 if(colorName){
-                    options.push({ label: colorName, option_display_name: "Color" })
+                    options.push({ label: colorName, option_display_name: "Color", extra: { colorCode: variantData[key] } })
                 }
                 break;
-            case "us_consumer_size": options.push({ label: variantData[key], option_display_name: "Size" })
+            case "us_consumer_size": options.push({ label: variantData[key], option_display_name: "Size", extra: { size: variantData[key] } })
         }
     }
     // filter out options which are missing any option from a switch case
