@@ -64,14 +64,14 @@ const getProductVariants = (product) => {
                 return o;
             });
             // update the sku based on 'ProductID-ColorCode-Size'
-            let { colorCode="", size="" } = extraData;
+            let { colorCode="", defaultSize="" } = extraData;
             // if we get size in form of 'XS/3' then just take the value after /
-            size = size.substring(size.indexOf("/")+1)
-            let newSku = [ product["product-id"]?.toString(), colorCode, size]
+            // size = size.substring(size.indexOf("/")+1)
+            let newSku = [ product["product-id"]?.toString(), colorCode, defaultSize]
                 .filter(v => v).join("-");
             obj.sku = newSku;
             // console.log("new SKU -> ", newSku)
-            // console.log(obj)
+            console.log(obj)
             variantArr.push(obj);
         }
     }
@@ -89,7 +89,7 @@ const getOptionValues = (variantData) => {
                     options.push({ label: colorName, option_display_name: "Color", extra: { colorCode: variantData[key] } })
                 }
                 break;
-            case "us_consumer_size": options.push({ label: variantData[key], option_display_name: "Size", extra: { size: variantData[key] } })
+            case "us_consumer_size": options.push({ label: variantData[key], option_display_name: "Size", extra: { defaultSize: variantData["EU_Order_Size"] } })
         }
     }
     // filter out options which are missing any option from a switch case
