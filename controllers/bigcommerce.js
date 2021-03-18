@@ -318,6 +318,50 @@ const listProductOptions = async (productId, params) => {
 }
 
 // ============================ Images ==================================== //
+const createProductImage = async (productId, data) => {
+    try {
+        let options = {
+            url: `${BaseURL}/v3/catalog/products/${productId}/images`,
+            method: 'post',
+            data: data,
+            headers: Headers
+          }
+          console.log("options", options)
+          let response = await axios.request(options);
+          // console.log(response);
+          return (response.data && response.data.data) || response.data;  
+    } catch (error) {
+        console.log(error)
+        if(error.response && error.response.data){
+            console.log(error.response.data)   
+        }else{
+            console.log(error)
+        }
+    }
+};
+
+const updateProductImage = async (productId, imageId, data) => {
+    try {
+        let options = {
+            url: `${BaseURL}/v3/catalog/products/${productId}/images/${imageId}`,
+            method: 'put',
+            data: data,
+            headers: Headers
+          }
+          console.log("options", options)
+          let response = await axios.request(options);
+          // console.log(response);
+          return (response.data && response.data.data) || response.data;  
+    } catch (error) {
+        console.log(error)
+        if(error.response && error.response.data){
+            console.log(error.response.data)   
+        }else{
+            console.log(error)
+        }
+    }
+};
+
 const createVariantImage = async (productId, variantId, data) => {
     try {
         let options = {
@@ -360,5 +404,7 @@ module.exports = {
     // 
     listProductOptions,
     // 
+    createProductImage,
+    updateProductImage,
     createVariantImage
 }
