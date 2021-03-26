@@ -38,7 +38,17 @@ const getCustomFields = (product) => {
         { "name": "backpack_use", "value": validateValue(product?.["backpackUse"]?.["en"], "string") },
         { "name": "seat_insert", "value": validateValue(product?.["SeatInsert"]?.["en"], "string") },
         { "name": "secondary_end_use", "value": validateValue(product?.["endUseSecondary"]?.["en"], "string") },
-        { "name": "shop_runner_eligible", "value": validateValue(product?.["sr_eligible"]?.["en"], "string") },        
+        { "name": "shop_runner_eligible", "value": validateValue(product?.["sr_eligible"]?.["en"], "string") },   
+        { "name": "search_placement", "value": validateValue(product?.["search-placement"], "string") },
+        { "name": "is_coming_soon", "value": validateValue(product?.["isComingSoon"]?.["en"], "string") },   
+        { "name": "is_new", "value": validateValue(product?.["isNew"]?.["en"], "string") },   
+        { "name": "model_number", "value": validateValue(product?.["modelNumber"]?.["en"], "string") },   
+        { "name": "new_colours", "value": validateValue(product?.["newColours"]?.["en"], "string") },   
+        { "name": "pdp_content_assets", "value": validateValue(product?.["pdpContentAssets"]?.["en"], "string") },
+        // todo: not populating value correctly "protection"
+        { "name": "protection", "value": validateValue(product?.["protection"]?.["en"], "string") }, 
+        { "name": "size_guide_id", "value": validateValue(product?.["sizeguideid"]?.["en"], "string") },   
+        { "name": "size_guide_update_asset_id", "value": validateValue(product?.["sizeguideupdateassetid"]?.["en"], "string") },
     ];
     fields = fields.filter(o => o.value);
     return fields;

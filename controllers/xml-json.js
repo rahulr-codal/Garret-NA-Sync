@@ -11,7 +11,7 @@ const xmlFileToJSON = async (filePath) => {
             // attrNodeName: "#attr",
             textNodeName: "#text",
             attributeNamePrefix: "",
-            arrayMode: "false",
+            arrayMode: false,
             ignoreAttributes: false,
             parseAttributeValue: true,
             trimValues: true,
