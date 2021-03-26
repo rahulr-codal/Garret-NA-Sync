@@ -60,7 +60,7 @@ const getProductVariants = (product) => {
     for(let variant of productVariants){
         let optionValues = getOptionValues(variant);
         let obj = {
-            // sku: variant["EAN"]?.toString(),
+            sku: variant.sku?.toString(),
             price: variant.price,
             upc: variant["EAN"]?.toString()
         };
@@ -79,7 +79,8 @@ const getProductVariants = (product) => {
             // size = size.substring(size.indexOf("/")+1)
             let newSku = [ product["product-id"]?.toString(), colorCode, defaultSize]
                 .filter(v => v).join("-");
-            obj.sku = newSku;
+            // update to new sku if undefined
+            obj.sku = obj.sku || newSku;
             // console.log("new SKU -> ", newSku)
             console.log(obj)
             variantArr.push(obj);

@@ -3,6 +3,7 @@ if(process.env.NODE_ENV == "development"){
 }
 const { processVariants }  = require('./controllers/products');
 const { xmlFileToJSON } = require('./controllers/xml-json');
+const { csvFileToJSON } = require("./controllers/csv-json");
 const { 
     getProduct,
     listProduct,
@@ -28,7 +29,12 @@ async function main() {
 
     // const productVarient = await xmlFileToJSON(`${__dirname}/xml/allSS21Variants.xml`);
     const productPrice = await xmlFileToJSON(`${__dirname}/xml/pricebook-us.xml`);
-    
+    // get EAN-SKU maping from CSV
+    const eanToSKUData = csvFileToJSON(`${__dirname}/csv/SKU-EAN-Mapping.csv`);
+    const EanSKUObj = (await eanToSKUData).reduce((acc, obj, i) => {
+        acc[obj["EAN"]] = obj["ItemCode_ SKU"] || null;
+        return acc;
+    }, {});
     let productsData = normalizeXMLJSONData(productArr['catalog']['product']);
     // let variantsData = productVarient['catalog']["product"];
     // variantsData = normalizeVariantXMLJSONData(variantsData);
@@ -46,7 +52,7 @@ async function main() {
     // filter out products which have 'online-flag': true and 'online-flag': { en: true }
     productsData = productsData.filter(o => o["online-flag"] == true || o["online-flag"]?.["en"] == true);
     console.log("Total products to sync:", productsData.length);
-    // for (let product of productsData.filter(p => p["product-id"] == 100501)) {
+    // for (let product of productsData.filter(p => p["product-id"] == 100652)) {
     for (let product of productsData) {
         // if(product["product-id"] < 100147){
         //     continue;
@@ -64,6 +70,8 @@ async function main() {
         product["variants"] = pVarient.map((obj) => {
             let price = SKUPriceUSD[obj.EAN] || 0
             obj.price = price;
+            // set sku from csv mapping
+            obj.sku = EanSKUObj[obj.EAN];
             return obj
         });
         
