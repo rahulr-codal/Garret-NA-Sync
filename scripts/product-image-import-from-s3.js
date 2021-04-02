@@ -113,7 +113,7 @@ const main = async () => {
                     let { url, ...imageDetails } = productImage;
                     // console.log("image details: ", imageDetails);
                     let isThumbnail = false;
-                    if(imageDetails.number == "1" || imageDetails.number == "01" ){
+                    if(imageDetails.number == "1" || imageDetails.number == "o01" ){
                         isThumbnail = true;
                     }
                     let imagePayload = {
