@@ -143,6 +143,7 @@ async function main() {
                 permission_set: "read_and_sf_access",
                 value: typeof value == "object" ? JSON.stringify(value): value,   
             }
+            obj.value = obj.value.replace(/&#13;/g, '|');
             let existingMetafieldKey = existingMetafields.find(em => em.key == key)
             if(existingMetafieldKey){
                 let metafieldId = existingMetafieldKey.id;
