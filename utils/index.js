@@ -1,12 +1,17 @@
 const validateValue = (value, type, charLimit=250) => {
-    if(!value && typeof value != "boolean"){ return null };
-    if(!value && type == "string"){
-        return ""
+    if(!value){
+        if(typeof value == "boolean" || type == "boolean"){
+            return "false";
+        }else if(type == "string"){
+            return "";
+        }else{
+            return null;
+        }
     }
     if(type == "string"){
         value = value.toString().trim().slice(0, charLimit); 
     }
-    return value;
+    return value.toString();
 }
 
 const titleCase = (str) => {
