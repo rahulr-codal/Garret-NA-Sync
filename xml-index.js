@@ -52,7 +52,7 @@ async function main() {
     // filter out products which have 'online-flag': true and 'online-flag': { en: true }
     productsData = productsData.filter(o => o["online-flag"] == true || o["online-flag"]?.["en"] == true);
     console.log("Total products to sync:", productsData.length);
-    // for (let product of productsData.filter(p => p["product-id"] == 100652)) {
+    // for (let product of productsData.filter(p => p["product-id"] == 100036)) {
     for (let product of productsData) {
         // if(product["product-id"] < 100147){
         //     continue;
@@ -143,7 +143,7 @@ async function main() {
                 permission_set: "read_and_sf_access",
                 value: typeof value == "object" ? JSON.stringify(value): value,   
             }
-            obj.value = obj.value.replace(/&#13;/g, '|');
+            obj.value = obj.value.replace(/&#13;/g, '');
             let existingMetafieldKey = existingMetafields.find(em => em.key == key)
             if(existingMetafieldKey){
                 let metafieldId = existingMetafieldKey.id;

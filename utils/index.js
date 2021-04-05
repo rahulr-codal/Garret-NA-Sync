@@ -11,7 +11,7 @@ const validateValue = (value, type, charLimit=250) => {
     if(type == "string"){
         value = value.toString().trim().slice(0, charLimit); 
     }
-    return value.toString();
+    return value.toString().replace(/&#13;/g, '');
 }
 
 const titleCase = (str) => {

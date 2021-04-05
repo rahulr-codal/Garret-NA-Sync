@@ -8,8 +8,8 @@ const convertToBigCProduct = async (data) => {
     const bigCommProductObj = {
         brand_name: "Gore", // not able to determined in csv,
         custom_fields: getCustomFields(product),
-        description: product?.["productDetails"]?.["en"] || "",
-        name: (product?.["display-name"]?.["en"] || "").slice(0, 255),
+        description: (product?.["productDetails"]?.["en"] || "").replace(/&#13;/g, ''),
+        name: (product?.["display-name"]?.["en"] || "").replace(/&#13;/g, '').slice(0, 255),
         inventory_tracking: "variant",
         is_free_shipping: false,
         is_visible: true,
