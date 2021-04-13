@@ -90,7 +90,7 @@ const getOptionValues = (variantData) => {
                     options.push({ label: colorName, option_display_name: "Color" })
                 }
                 break;
-            case "size": options.push({ label: variantData[key]["en"], option_display_name: "Size" })
+            case "size": options.push({ label: variantData[key]["en"].toString(), option_display_name: "Size" })
                 break;
         }
         console.log(options);
