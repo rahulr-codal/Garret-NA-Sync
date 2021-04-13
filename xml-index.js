@@ -20,14 +20,11 @@ const {
     normalizeXMLJSONData, 
     normalizeVariantXMLJSONData,
     normalizePriceXMLJSONData
- } = require("./utils/convert-xml-version")
+ } = require("./utils/convert-xml-version-v2")
 
 async function main() {
-    // const productArr = await xmlFileToJSON(`${__dirname}/xml/productsSS21.xml`);
     const productArr = await xmlFileToJSON(`${__dirname}/xml/allSS21MasterProducts.xml`);
-    // const productVarient = await xmlFileToJSON(`${__dirname}/xml/variantsSS21.xml`);
-
-    // const productVarient = await xmlFileToJSON(`${__dirname}/xml/allSS21Variants.xml`);
+    const productVarient = await xmlFileToJSON(`${__dirname}/xml/allSS21Variants.xml`);
     const productPrice = await xmlFileToJSON(`${__dirname}/xml/pricebook-us.xml`);
     // get EAN-SKU maping from CSV
     const eanToSKUData = csvFileToJSON(`${__dirname}/csv/SKU-EAN-Mapping.csv`);
@@ -36,9 +33,11 @@ async function main() {
         return acc;
     }, {});
     let productsData = normalizeXMLJSONData(productArr['catalog']['product']);
-    // let variantsData = productVarient['catalog']["product"];
-    // variantsData = normalizeVariantXMLJSONData(variantsData);
-    // console.log(JSON.stringify(variantsData));
+    let variantsData = productVarient['catalog']["product"];
+    // console.log(variantsData[0]["custom-attributes"])
+    variantsData = normalizeXMLJSONData(variantsData);
+    // console.log(JSON.stringify(variantsData.filter(o => o["modelNumber"]["en"] == 10002).map(o => o["product-id"])));
+
     let allVariantPrices = productPrice["pricebooks"]?.["pricebook"]?.["price-tables"]?.["price-table"] || [];
     allVariantPrices = normalizePriceXMLJSONData(allVariantPrices);
     // convert prices to obj [EAN, price]
@@ -52,7 +51,7 @@ async function main() {
     // filter out products which have 'online-flag': true and 'online-flag': { en: true }
     productsData = productsData.filter(o => o["online-flag"] == true || o["online-flag"]?.["en"] == true);
     console.log("Total products to sync:", productsData.length);
-    // for (let product of productsData.filter(p => p["product-id"] == 100036)) {
+    // for (let product of productsData.filter(p => p["product-id"] == 100147)) {
     for (let product of productsData) {
         // if(product["product-id"] < 100147){
         //     continue;
@@ -62,16 +61,29 @@ async function main() {
         // const pVarientOld = variantsData.filter(
         //     (i) => i["product-id"] == product["product-id"]);
         // console.log("\n\nOld Pvariants", JSON.stringify(pVarientOld));
-        let productVariantsData = [{
-            "product-id": product["product-id"],
-            "variations": product.variations
-        }];
-        const pVarient = normalizeVariantXMLJSONData(productVariantsData);
-        product["variants"] = pVarient.map((obj) => {
-            let price = SKUPriceUSD[obj.EAN] || 0
+        
+        // uncomment below block while using v1
+        // let productVariantsData = [{
+        //     "product-id": product["product-id"],
+        //     "variations": product.variations
+        // }];
+        // const pVarient = normalizeVariantXMLJSONData(productVariantsData);
+        // product["variants"] = pVarient.map((obj) => {
+        //     let price = SKUPriceUSD[obj.EAN] || 0
+        //     obj.price = price;
+        //     // set sku from csv mapping
+        //     obj.sku = EanSKUObj[obj.EAN];
+        //     return obj
+        // });
+        // ==== block end
+
+        // use this while using v2
+        product["variants"] = variantsData.filter(o => o["modelNumber"]["en"] == product["product-id"]).map((obj) => {
+            let EAN = obj["product-id"]
+            let price = SKUPriceUSD[EAN] || 0
             obj.price = price;
             // set sku from csv mapping
-            obj.sku = EanSKUObj[obj.EAN];
+            obj.sku = EanSKUObj[EAN];
             return obj
         });
         
