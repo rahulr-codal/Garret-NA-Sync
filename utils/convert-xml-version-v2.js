@@ -193,7 +193,7 @@ const getCategoriesIds = async (product) => {
     let productTypeCatIds = [];
     console.log("Product type", productType);
     if(productType){
-        let productTypeCategories = genderFilteredCategories.filter(cat => cat.name.toLowerCase().includes(productType))
+        let productTypeCategories = genderFilteredCategories.filter(cat => cat.name.toLowerCase() == productType)
         console.log("productTypeCategories", productTypeCategories);
         productTypeCatIds = productTypeCategories.map(obj => obj.id);
     }
