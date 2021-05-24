@@ -133,7 +133,9 @@ const CategoryMapping = {
     "selectedfabric": "Selected Fabric",
     "shakedry": "Shake Dry",
     "road": "Cycling",
-    "baselayer": "Baselayers"
+    "baselayer": "Baselayers",
+    "jackets": "Jackets & Vest",
+    "vests": "Jackets & Vest"
 };
 
 const getCategoriesIds = async (product) => {
