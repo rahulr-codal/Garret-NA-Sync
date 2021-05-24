@@ -147,7 +147,11 @@ const getCategoriesIds = async (product) => {
     let fabricTech = product?.["fabricTechnology"]?.["en"];
 
     let secondaryEndUse = 
-        product?.["endUseSecondary"]?.["en"].split(",").filter(v => v)
+        product?.["endUseSecondary"]?.["en"] || "";
+    if(Array.isArray(secondaryEndUse)){
+        secondaryEndUse = secondaryEndUse.join(",");
+    }
+    secondaryEndUse =  secondaryEndUse.split(",").filter(v => v)
         .map(v => { return ( CategoryMapping[v] ? CategoryMapping[v] : v ).toLowerCase() })
     gender = gender?.["en"].toLowerCase();
     sport = sport?.["en"].toLowerCase();
@@ -155,9 +159,9 @@ const getCategoriesIds = async (product) => {
     fabricTech = fabricTech.toLowerCase();
 
     // check if it is part of category mapping then get the corrosponding value
-    productType = 
+    let productTypeMapped = 
         CategoryMapping[productType] ? CategoryMapping[productType].toLowerCase(): productType;
-    fabricTech = 
+    let fabricTechMapped = 
         CategoryMapping[fabricTech] ? CategoryMapping[fabricTech].toLowerCase() : fabricTech;
     
         // get categories by gender first
@@ -193,37 +197,48 @@ const getCategoriesIds = async (product) => {
     // }
     console.log("genderFilteredCategories -> ", genderFilteredCategories)
     // get categories based on product type
-    let productTypeCatIds = [];
-    console.log("Product type", productType);
-    if(productType){
-        let productTypeCategories = genderFilteredCategories.filter(cat => cat.name.toLowerCase() == productType)
-        console.log("productTypeCategories", productTypeCategories);
-        productTypeCatIds = productTypeCategories.map(obj => obj.id);
+    let productTypeCatInsideGenderIds = [];
+    console.log("Product type", productTypeMapped);
+    if(productTypeMapped){
+        let productTypeInsideGenderCategories = genderFilteredCategories.filter(
+            cat => [productTypeMapped, productType].includes(cat.name.toLowerCase()))
+        console.log("productTypeInsideGenderCategories", productTypeInsideGenderCategories);
+        productTypeCatInsideGenderIds = productTypeInsideGenderCategories.map(obj => obj.id);
     }
     
     // get categories based on product sport
     let sportCategoriesIds = [];
+    let productTypeCatInsideSportsIds = [];
     if(sport){
         let sportCategories = categories.filter(cat => cat.name.toLowerCase().includes(sport));
         sportCategoriesIds = sportCategories.map(obj => obj.id);
+        console.log("sportCategoriesIds: ", sportCategoriesIds)
+        
+        // get all categories which are given sports or have sprots as a parent category 
+        let sportFilteredCategories = categories.filter(cat => [sportCategoriesIds].includes(cat.id) || sportCategoriesIds.some(id => cat.parentIds.includes(id)))
+        console.log("sportFilteredCategories -> ", sportFilteredCategories)
+        // get product categories which are sub category Activity 
+        let productTypeCatInsideSports = sportFilteredCategories.filter(cat => [productTypeMapped, productType].includes(cat.name.toLowerCase()))
+        console.log("productTypeCatInsideSports", productTypeCatInsideSports);
+        productTypeCatInsideSportsIds = productTypeCatInsideSports.map(obj => obj.id);
     }
 
     // get categories based on technology
     let fabricTechCategoriesIds = [];
-    if(fabricTech){
-        let fabricTechCategories = categories.filter(cat => cat.name.toLowerCase() == fabricTech);
+    if(fabricTechMapped){
+        let fabricTechCategories = categories.filter(cat => [fabricTechMapped, fabricTech].includes(cat.name.toLowerCase()));
         fabricTechCategoriesIds = fabricTechCategories.map(obj => obj.id);
     }
     
     // get categories based on 'secondary end use' field
-    // console.log(secondaryEndUse);
+    console.log("secondaryEndUse:", secondaryEndUse);
     let secondaryEndUseCategoriesIds = [];
     if(secondaryEndUse){
         let secondaryEndUseCategories = categories.filter(cat => secondaryEndUse.some(el => cat.name.toLowerCase().includes(el)))
         secondaryEndUseCategoriesIds = secondaryEndUseCategories.map(obj => obj.id);
     }
 
-    categoryIds = [ ...categoryIds, ...productTypeCatIds,
+    categoryIds = [ ...categoryIds, ...productTypeCatInsideGenderIds, ...productTypeCatInsideSportsIds,
         ...secondaryEndUseCategoriesIds, ...sportCategoriesIds, ...fabricTechCategoriesIds];
 
     console.log(categoryIds);
@@ -465,7 +480,7 @@ const normalizeXMLJSONData = (data) => {
             }
             if(Array.isArray(value)){
                 value = value.reduce((acc, obj) => {
-                    let textValue = obj['#text'] || "";
+                    let textValue = obj['#text'] || obj["value"] || "";
                     let keyValue = obj["xml:lang"] || "en";
                     keyValue = (keyValue == "x-default") ? "en" : keyValue;
                     if(obj["attribute-id"]){

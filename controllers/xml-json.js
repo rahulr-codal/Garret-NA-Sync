@@ -1,6 +1,7 @@
 const fs = require("fs");
 const parser = require("fast-xml-parser");
 const xml2js = require('xml2js');
+const { parseNumbers, parseBooleans} = xml2js.processors;
 
 const xmlFileToJSON = async (filePath) => {
     try {
@@ -34,7 +35,9 @@ const xmlFileToJSONV2 = async (filePath) => {
             normalize: true,
             trim: true,
             explicitArray: false,
-            includeWhiteChars: true
+            charkey: "#text",
+            includeWhiteChars: true,
+            valueProcessors: [parseNumbers, parseBooleans]
         };
         const jsonData = xml2js.parseStringPromise(xmlData, options);
         return jsonData;
