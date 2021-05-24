@@ -132,7 +132,8 @@ const CategoryMapping = {
     "warmers": "Socks & Accessories",
     "selectedfabric": "Selected Fabric",
     "shakedry": "Shake Dry",
-    "road": "Cycling"
+    "road": "Cycling",
+    "baselayer": "Baselayers"
 };
 
 const getCategoriesIds = async (product) => {
