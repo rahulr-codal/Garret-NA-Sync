@@ -20,7 +20,7 @@ const {
     normalizeXMLJSONData, 
     normalizeVariantXMLJSONData,
     normalizePriceXMLJSONData
- } = require("./utils/convert-xml-version-v2")
+ } = require("./utils/convert-xml-version-v3")
 
 async function main() {
     const productArr = await xmlFileToJSON(`${__dirname}/xml/allSS21MasterProducts.xml`);
@@ -51,7 +51,7 @@ async function main() {
     // filter out products which have 'online-flag': true and 'online-flag': { en: true }
     productsData = productsData.filter(o => o["online-flag"] == true || o["online-flag"]?.["en"] == true);
     console.log("Total products to sync:", productsData.length);
-    // for (let product of productsData.filter(p => p["product-id"] == 100147)) {
+    // for (let product of productsData.filter(p => p["product-id"] == 100624)) {
     for (let product of productsData) {
         // if(product["product-id"] < 100147){
         //     continue;
